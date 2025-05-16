@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -8,7 +8,25 @@ import {
   View,
 } from "react-native";
 
+const API_KEY = process.env.API_KEY;
+const BASE_URL = process.env.BASE_URL;
+
 export default function Index() {
+  const [searchText, setSearchText] = useState("");
+
+  const fetchNews = async () => {
+    if (!searchText) return;
+    try {
+      const response = await fetch(
+        `${BASE_URL}?q=${encodeURIComponent(searchText)}&apiKey=${API_KEY}`
+      );
+      const data = await response.json();
+      console.log(data.articles);
+    } catch (error) {
+      console.error("Error fetching news:", error);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.screenSafeView}>
       <View style={styles.screen}>
@@ -16,9 +34,11 @@ export default function Index() {
         <TextInput
           style={styles.inputField}
           placeholder="Enter topic or keyword..."
+          value={searchText}
+          onChangeText={setSearchText}
           placeholderTextColor="#999"
         />
-        <TouchableOpacity style={styles.searchButton} onPress={() => null}>
+        <TouchableOpacity style={styles.searchButton} onPress={fetchNews}>
           <Text style={styles.searchButtonText}>Search</Text>
         </TouchableOpacity>
       </View>
